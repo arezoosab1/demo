@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 app = dash.Dash(__name__)
 
-df_SIS_Seri5or3= pd.read_csv('C:\EaaS\data.csv')
+df_SIS_Seri5or3= pd.read_csv('https://github.com/arezoosab1/demo/blob/main/data.csv')
 
 
 #finding average lines 
