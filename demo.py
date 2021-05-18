@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 app = dash.Dash(__name__)
 
-df_SIS_Seri5or3= pd.read_excel('C:\EaaS\app\data.csv')
+df_SIS_Seri5or3= pd.read_csv('C:\EaaS\data.csv')
 
 
 #finding average lines 
@@ -40,7 +40,7 @@ app.layout = html.Div([
                  options=[{'label': 'Country', 'value': 'Maschinenstandort'},
 			              {'label': 'Machine DevCode', 'value': 'EquipTyp_Gruppiert'},
 			              {'label': 'Machine Type', 'value': 'type'}],
-		          value= 'Maschinenstandort',
+		        value= 'Maschinenstandort',
                  multi=False,
                  style={'width': "40%"}
                  ),
@@ -66,23 +66,23 @@ def update_graph(slct_equip, slct_clnm):
   
     # Plotly Express
 
-    fig = px.scatter(df[df.EquipNr != slct_equip], x="NC_Mittel", y="Strahl/NC", color = slct_clnm, hover_name="EquipNr", hover_data=['top_NC_Mittel','top_Strahl_Mittel','top_Strahl/NC'])
-    fig.update_traces(marker=dict(size=4), selector=dict(mode='markers'))
+    fig = px.scatter(df[df.EquipNr != slct_equip], x="NC_Mittel", y="Strahl/NC", color = slct_clnm, hover_name="EquipNr",
+                     hover_data=['top_NC_Mittel', 'top_Strahl_Mittel', 'top_Strahl/NC'])
+    fig.update_traces(marker=dict(size=5), selector=dict(mode='markers'))
 
-    fig2 = px.scatter(df[df.EquipNr == slct_equip], x="NC_Mittel", y="Strahl/NC", hover_name="EquipNr", hover_data=['top_NC_Mittel','top_Strahl_Mittel','top_Strahl/NC'], color_discrete_sequence = ['Black'])
-    fig2.update_traces(marker=dict(size=6, line=dict(width=1, color='darkgrey')), selector=dict(mode='markers'))
+    fig2 = px.scatter(df[df.EquipNr == slct_equip], x="NC_Mittel", y="Strahl/NC", color = slct_clnm, hover_name="EquipNr",
+                      hover_data=['top_NC_Mittel', 'top_Strahl_Mittel', 'top_Strahl/NC'],
+                      color_discrete_sequence = ['Black'])
+    fig2.update_traces(marker=dict(size=7, line=dict(width=1, color='darkgrey')), selector=dict(mode='markers'))
 
     fig.add_trace(fig2.data[0])
-
-
-
-    fig.add_hline(y=mean_NCtoStrahl)
-    fig.add_vline(x=mean_NC)
+    fig.add_hline(y=mean_NCtoStrahl, line_width=2, line_dash="dash", line_color="green")
+    fig.add_vline(x=mean_NC, line_width=2, line_dash="dash", line_color="green")
     fig.update_xaxes(showspikes=True, spikecolor="grey", spikethickness=2, spikesnap="cursor", spikemode="across")
     fig.update_yaxes(showspikes=True, spikecolor="grey", spikethickness=2, spikesnap="cursor", spikemode="across")
     fig.update_layout(spikedistance=10, hoverdistance=10)
     fig.update_layout(
-    xaxis_title="average NC run-time per year(h)",
+    xaxis_title="Average NC run-time per year(h)",
     yaxis_title="Beam on (percent)"
     )
 
