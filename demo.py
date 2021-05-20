@@ -12,8 +12,8 @@ df_SIS_Seri5or3= pd.read_csv('C:\EaaS\data.csv')
 
 
 #finding average lines 
-mean_NC = df_SIS_Seri5or3["NC_Mittel"].mean()
-mean_NCtoStrahl = df_SIS_Seri5or3['Strahl/NC'].mean()
+median_NC = df_SIS_Seri5or3["NCtime(h/year)"].median()
+median_NCtoStrahl = df_SIS_Seri5or3['BeamON%'].median()
 
 #list of equipments
 equip_lst = df_SIS_Seri5or3.EquipNr.to_list() 
@@ -37,10 +37,10 @@ app.layout = html.Div([
                  style={'width': "40%"}
                  ),
     dcc.Dropdown(id="slct_clnm",
-                 options=[{'label': 'Country', 'value': 'Maschinenstandort'},
-			              {'label': 'Machine DevCode', 'value': 'EquipTyp_Gruppiert'},
-			              {'label': 'Machine Type', 'value': 'type'}],
-		        value= 'Maschinenstandort',
+                 options=[{'label': 'Country', 'value': 'Country'},
+			              {'label': 'Machine DevCode', 'value': 'Machine_DevCode'},
+			              {'label': 'Machine Type', 'value': 'MachineType'}],
+		        value= 'Machine_DevCode',
                  multi=False,
                  style={'width': "40%"}
                  ),
@@ -66,25 +66,28 @@ def update_graph(slct_equip, slct_clnm):
   
     # Plotly Express
 
-    fig = px.scatter(df[df.EquipNr != slct_equip], x="NC_Mittel", y="Strahl/NC", color = slct_clnm, hover_name="EquipNr",
-                     hover_data=['top_NC_Mittel', 'top_Strahl_Mittel', 'top_Strahl/NC'])
+    fig = px.scatter(df[df.EquipNr != slct_equip], x='NCtime(h/year)', y='BeamON%', color = slct_clnm, hover_name="EquipNr",
+                     hover_data=['Machine_DevCode','MachineType','Country','top_NCtime','top_BeamON%','top_overall'])
     fig.update_traces(marker=dict(size=5), selector=dict(mode='markers'))
 
-    fig2 = px.scatter(df[df.EquipNr == slct_equip], x="NC_Mittel", y="Strahl/NC", color = slct_clnm, hover_name="EquipNr",
-                      hover_data=['top_NC_Mittel', 'top_Strahl_Mittel', 'top_Strahl/NC'],
+    fig2 = px.scatter(df[df.EquipNr == slct_equip], x='NCtime(h/year)', y='BeamON%', color = slct_clnm, hover_name="EquipNr",
+                      hover_data=['Machine_DevCode', 'MachineType', 'Country', 'top_NCtime', 'top_BeamON%', 'top_overall'],
                       color_discrete_sequence = ['Black'])
     fig2.update_traces(marker=dict(size=7, line=dict(width=1, color='darkgrey')), selector=dict(mode='markers'))
 
     fig.add_trace(fig2.data[0])
-    fig.add_hline(y=mean_NCtoStrahl, line_width=2, line_dash="dash", line_color="green")
-    fig.add_vline(x=mean_NC, line_width=2, line_dash="dash", line_color="green")
+    fig.add_hline(y=median_NCtoStrahl, line_width=2, line_dash="dash", line_color="green")
+    fig.add_vline(x=median_NC, line_width=2, line_dash="dash", line_color="green")
     fig.update_xaxes(showspikes=True, spikecolor="grey", spikethickness=2, spikesnap="cursor", spikemode="across")
     fig.update_yaxes(showspikes=True, spikecolor="grey", spikethickness=2, spikesnap="cursor", spikemode="across")
     fig.update_layout(spikedistance=10, hoverdistance=10)
+    fig.update_layout(xaxis_range=[0, 9000])
+    fig.update_layout(yaxis_range=[0, 100])
+
     fig.update_layout(
-    xaxis_title="Average NC run-time per year(h)",
-    yaxis_title="Beam on (percent)"
-    )
+        xaxis_title="Average NC run-time per year(h)",
+        yaxis_title="Beam on (percent)")
+
 
 
     return fig
